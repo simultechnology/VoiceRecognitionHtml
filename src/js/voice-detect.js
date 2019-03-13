@@ -1,4 +1,5 @@
 
+import Recorder from './recorder'
 console.log('start')
 
 // const btn = document.querySelector('button')
@@ -30,7 +31,7 @@ stopButton.addEventListener('click', function() {
 const handleSuccess = (stream) => {
   const options = { mimeType: 'video/webm;codecs=vp9' }
   const recordedChunks = []
-  const mediaRecorder = new MediaRecorder(stream, options)
+  const mediaRecorder = new Recorder(stream, options)
 
   mediaRecorder.ondataavailable = (e) => {
     console.log(e)
@@ -47,7 +48,7 @@ const handleSuccess = (stream) => {
   mediaRecorder.addEventListener('stop', () => {
     downloadLink.href = URL.createObjectURL(
       new Blob(recordedChunks, { 'type' : 'audio/wav; codecs=MS_PCM' }))
-    downloadLink.download = 'acetest.mp3'
+    downloadLink.download = 'acetest.wav'
   })
 
   mediaRecorder.start(1000)
