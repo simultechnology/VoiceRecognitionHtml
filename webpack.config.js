@@ -2,7 +2,8 @@ module.exports = {
   entry: {
     app: './src/js/app.js',
     app2: './src/js/app2.js',
-    'voice-detect': './src/js/voice-detect.js'
+    'voice-detect': './src/js/voice-detect.js',
+    'recorder': './src/js/my-recorder.js'
   },
   output: {
     filename: '[name].js'

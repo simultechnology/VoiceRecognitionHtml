@@ -2,76 +2,51 @@
 import Recorder from './recorder'
 console.log('start')
 
-// const btn = document.querySelector('button')
-// const speech = new webkitSpeechRecognition()
-// speech.lang = 'ja-JP'
-//
-// btn.addEventListener('click', () => {
-//   // console.log('button clicked!!!')
-//   btn.disabled = true
-//   speech.start()
-// })
-//
-// speech.onresult = (e) => {
-//   console.log(e)
-//   speech.stop()
-// }
+window.AudioContext = window.AudioContext || window.webkitAudioContext
+navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia
+window.URL = window.URL || window.webkitURL
 
-// const player = document.getElementById('player')
+const audioContext = new AudioContext()
+let mediaRecorder
 
-let shouldStop = false
-let stopped = false
-const downloadLink = document.getElementById('download')
 const stopButton = document.getElementById('stop')
+const startButton = document.getElementById('start')
 
-stopButton.addEventListener('click', function() {
-  shouldStop = true
+stopButton.addEventListener('click', () => {
+  // shouldStop = true
+  mediaRecorder && mediaRecorder.stop()
+  createDownloadLink()
+  mediaRecorder.clear()
+})
+
+startButton.addEventListener('click', () => {
+  mediaRecorder.record()
 })
 
 const handleSuccess = (stream) => {
-  const options = { mimeType: 'video/webm;codecs=vp9' }
-  const recordedChunks = []
-  const mediaRecorder = new Recorder(stream, options)
-
-  mediaRecorder.ondataavailable = (e) => {
-    console.log(e)
-    if (e.data.size > 0) {
-      recordedChunks.push(e.data)
-    }
-
-    if (shouldStop === true && stopped === false) {
-      mediaRecorder.stop()
-      stopped = true
-    }
-  }
-
-  mediaRecorder.addEventListener('stop', () => {
-    downloadLink.href = URL.createObjectURL(
-      new Blob(recordedChunks, { 'type' : 'audio/wav; codecs=MS_PCM' }))
-    downloadLink.download = 'acetest.wav'
-  })
-
-  mediaRecorder.start(1000)
+  let input = audioContext.createMediaStreamSource(stream)
+  mediaRecorder = new Recorder(input)
 }
 
-// const handleSuccess = (stream) => {
-//   // if (window.URL) {
-//   //   player.src = window.URL.createObjectURL(stream)
-//   // } else {
-//   //   player.src = stream
-//   // }
-//   const context = new AudioContext()
-//   const input = context.createMediaStreamSource(stream)
-//   const processor = context.createScriptProcessor(1024, 1, 1)
-//
-//   input.connect(processor);
-//   processor.connect(context.destination);
-//
-//   processor.onaudioprocess = (e) => {
-//     // Do something with the data, i.e Convert this to WAV
-//     console.log(e.inputBuffer);
-//   }
-// }
+function createDownloadLink () {
+  mediaRecorder && mediaRecorder.exportWAV(blob => {
+    const recordingsList = document.getElementById('recordingslist')
+    const url = URL.createObjectURL(blob)
+    const li = document.createElement('li')
+    const au = document.createElement('audio')
+    const hf = document.createElement('a')
 
-navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-  .then(handleSuccess)
+    au.controls = true
+    au.src = url
+    hf.href = url
+    hf.download = new Date().toISOString() + '.wav'
+    hf.innerHTML = hf.download
+    li.appendChild(au)
+    li.appendChild(hf)
+    recordingsList.appendChild(li)
+  })
+}
+
+navigator.getUserMedia({ audio: true, video: false }, handleSuccess, (e) => {
+  console.log(e)
+})
