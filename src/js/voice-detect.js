@@ -3,11 +3,11 @@ import Recorder from './recorder'
 console.log('start')
 
 window.AudioContext = window.AudioContext || window.webkitAudioContext
-navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia
 window.URL = window.URL || window.webkitURL
 
-const audioContext = new AudioContext()
+let audioContext
 let mediaRecorder
+let gumStream
 
 const stopButton = document.getElementById('stop')
 const startButton = document.getElementById('start')
@@ -15,17 +15,22 @@ const startButton = document.getElementById('start')
 stopButton.addEventListener('click', () => {
   // shouldStop = true
   mediaRecorder && mediaRecorder.stop()
+  gumStream.getAudioTracks()[0].stop()
   createDownloadLink()
   mediaRecorder.clear()
 })
 
 startButton.addEventListener('click', () => {
-  mediaRecorder.record()
+  navigator.mediaDevices.getUserMedia({ audio: true, video: false })
+    .then(handleSuccess)
 })
 
 const handleSuccess = (stream) => {
+  audioContext = new AudioContext()
+  gumStream = stream
   let input = audioContext.createMediaStreamSource(stream)
-  mediaRecorder = new Recorder(input)
+  mediaRecorder = new Recorder(input, { numChannels: 1 })
+  mediaRecorder.record()
 }
 
 function createDownloadLink () {
@@ -46,7 +51,3 @@ function createDownloadLink () {
     recordingsList.appendChild(li)
   })
 }
-
-navigator.getUserMedia({ audio: true, video: false }, handleSuccess, (e) => {
-  console.log(e)
-})
