@@ -7,12 +7,18 @@ css: "web_speech"
 <!DOCTYPE html>
 <html lang="ja">
 <%- include('./_partial/head', pageData) %>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <body>
   <!--<button>Start</button>-->
   <!--<audio id="player" controls></audio>-->
   <ul id="recordingslist"></ul>
-  <button id="start">Start</button><br>
-  <button id="stop">Stop</button>
+  <div>
+    <button id="start" class="btn btn-primary">Start</button><br>
+  </div>
+  <div>
+    <button id="stop" disabled="disabled" class="btn btn-secondary">Stop</button>
+  </div>
+  <div id="result"></div>
 <footer>
   &copy; simultechnology.com
 </footer>
